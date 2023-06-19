@@ -13,7 +13,7 @@ import java.util.*;
 public class AirportRepository {
     Map<String,Airport> airportMap=new HashMap<>();
     Map<Integer, Flight>flightMap=new HashMap<>();
-    Map<Integer, List<Passenger>>flight_passenger=new HashMap<>();
+    HashMap<Integer, List<Integer>> ticketHashMap = new HashMap<>();
     Map<Integer,Passenger>passengerMap=new HashMap<>();
 
     public void addAirport(Airport airport){
@@ -54,38 +54,35 @@ public class AirportRepository {
 
     public String bookTicket(Integer flightId, Integer passengerId) {
 
-        if(flight_passenger.containsKey(flightId)){
-            List<Passenger> psgList=flight_passenger.get(flightId);
+        if(ticketHashMap.containsKey(flightId)){
+            List<Integer> psgList=ticketHashMap.get(flightId);
             Flight flight=flightMap.get(flightId);
-            if(flight.getMaxCapacity()<psgList.size()){
-                for(Passenger psg:psgList){
-                    if(psg.getPassengerId()==passengerId){
-                        return "FAILURE";
-                    }
-                }
-                psgList.add(passengerMap.get(passengerId));
-                flight_passenger.put(flightId,psgList);
-            }else return "FAILURE";
+            if(flight.getMaxCapacity()==psgList.size())
+                return "FAILURE";
+            if(psgList.contains(passengerId))
+                return "FAILURE";
+
+            psgList.add(passengerId);
+            ticketHashMap.put(flightId,psgList);
+            return  "SUCCESS";
         }else{
-            List<Passenger>newPsgList=new ArrayList<>();
-            newPsgList.add(passengerMap.get(passengerId));
-            flight_passenger.put(flightId,newPsgList);
+            List<Integer>newPsgList=new ArrayList<>();
+            newPsgList.add(passengerId);
+            ticketHashMap.put(flightId,newPsgList);
+            return  "SUCCESS";
         }
-        return  "SUCCESS";
+
     }
 
     public String cancelATicket(Integer flightId, Integer passengerId) {
 
-        if(flight_passenger.containsKey(flightId)){
-            List<Passenger>psgList=flight_passenger.get(flightId);
-            for(Passenger psg:psgList){
-                if(psg.getPassengerId()==passengerId){
-                    psgList.remove(psg);
-                    flight_passenger.put(flightId,psgList);
-                    return "SUCCESS";
-                }
-            }
-
+        if(ticketHashMap.containsKey(flightId)){
+            List<Integer>psgList=ticketHashMap.get(flightId);
+           if(psgList.contains(passengerId)){
+               psgList.remove(passengerId);
+               ticketHashMap.put(flightId,psgList);
+               return "SUCCESS";
+           }else return "FAILURE";
         }
         return "FAILURE";
     }
@@ -114,7 +111,7 @@ public class AirportRepository {
     }
 
     public int calculateFlightFare(Integer flightId) {
-        int numOfPassenger=flight_passenger.get(flightId).size();
+        int numOfPassenger=ticketHashMap.get(flightId).size();
         return 3000+(numOfPassenger*50);
 
     }
@@ -123,10 +120,10 @@ public class AirportRepository {
        int ans=0;
         if(airportMap.containsKey(airportName)){
            City city=airportMap.get(airportName).getCity();
-           for(Integer flightId:flight_passenger.keySet()){
+           for(Integer flightId:ticketHashMap.keySet()){
               Flight flight =flightMap.get(flightId);
               if(flight.getFlightDate().equals(date)&&(flight.getFromCity().equals(city)||flight.getToCity().equals(city))){
-                  ans+=flight_passenger.get(flightId).size();
+                  ans+=ticketHashMap.get(flightId).size();
               }
            }
        }
@@ -135,8 +132,8 @@ public class AirportRepository {
 
     public int calculateRevenueOfAFlight(Integer flightId) {
         int revenue=0;
-        if(flight_passenger.containsKey(flightId)){
-            int size=flight_passenger.get(flightId).size();
+        if(ticketHashMap.containsKey(flightId)){
+            int size=ticketHashMap.get(flightId).size();
             for(int i=0;i<size;i++){
                 revenue+=3000+(i*50);
             }
@@ -146,9 +143,10 @@ public class AirportRepository {
 
     public int countOfBookingsDoneByPassengerAllCombined(Integer passengerId) {
         int ans=0;
-        for(List<Passenger>psgList:flight_passenger.values()){
-            for(Passenger psg:psgList){
-                if(psg.getPassengerId()==passengerId){
+        for(List<Integer>psgList:ticketHashMap.values()){
+            for(Integer id:psgList){
+
+                if(id==passengerId){
                     ans++;
                 }
             }
