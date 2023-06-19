@@ -77,12 +77,18 @@ public class AirportRepository {
     public String cancelATicket(Integer flightId, Integer passengerId) {
 
         if(ticketHashMap.containsKey(flightId)){
+            boolean removed=false;
             List<Integer>psgList=ticketHashMap.get(flightId);
-           if(psgList.contains(passengerId)){
+           if(psgList==null)return"FAILURE";
+            if(psgList.contains(passengerId)){
                psgList.remove(passengerId);
-               ticketHashMap.put(flightId,psgList);
-               return "SUCCESS";
-           }else return "FAILURE";
+               removed=true;
+           }
+            if(removed){
+                ticketHashMap.put(flightId,psgList);
+                return "SUCCESS";
+            }else return "FAILURE";
+
         }
         return "FAILURE";
     }
@@ -102,6 +108,17 @@ public class AirportRepository {
             }
         }
         return null;
+
+//        for (Flight flight : flightMap.values()) {
+//            if (flight.getFlightId() == flightId) {
+//                City city = flight.getFromCity();
+//                for (Airport airport : airportMap.values()) {
+//                    if (airport.getCity().equals(city))
+//                        return airport.getAirportName();
+//                }
+//            }
+//        }
+//        return null;
     }
 
     public String addPassenger(Passenger passenger) {
