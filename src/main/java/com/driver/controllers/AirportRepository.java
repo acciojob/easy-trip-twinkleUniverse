@@ -17,30 +17,25 @@ public class AirportRepository {
     Map<Integer,Passenger>passengerMap=new HashMap<>();
 
     public void addAirport(Airport airport){
-       if(airportMap.containsKey(airport.getAirportName())){
-           airportMap.put(airport.getAirportName(),airport);
-       }else{
+
            airportMap.put(airport.getAirportName(), airport);
-       }
     }
 
     public String getLargestAirportName() {
-        int max_terminal=0;
-        String LargestAirport=null;
-      for(String name_airport:airportMap.keySet()){
-         Airport air_port=airportMap.get(name_airport);
-         int No_terminals=air_port.getNoOfTerminals();
-         if(max_terminal<No_terminals){
-             max_terminal=No_terminals;
-             LargestAirport=air_port.getAirportName();
-         }else if(max_terminal==No_terminals){
-             int n=LargestAirport.compareTo(air_port.getAirportName());
-             if(n>0){
-                 LargestAirport=air_port.getAirportName();
-             }
-         }
-      }
-      return LargestAirport;
+       int maxTerminal=0;
+       for(Airport airport:airportMap.values()){
+           if(airport.getNoOfTerminals()>=maxTerminal){
+               maxTerminal=airport.getNoOfTerminals();
+           }
+       }
+       List<String>list=new ArrayList<>();
+       for(Airport airport:airportMap.values()){
+           if(airport.getNoOfTerminals()==maxTerminal){
+               list.add(airport.getAirportName());
+           }
+       }
+       Collections.sort(list);
+       return list.get(0);
     }
 
     public double getShortestDurationOfPossibleBetweenTwoCities(City fromCity, City toCity) {
