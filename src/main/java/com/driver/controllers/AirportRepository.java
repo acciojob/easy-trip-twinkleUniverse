@@ -99,26 +99,26 @@ public class AirportRepository {
     }
 
     public String getAirportNameFlightId(Integer flightId) {
-        if(flightMap.containsKey(flightId)){
-            Flight flight=flightMap.get(flightId);
-            for(Airport airport:airportMap.values()){
-                if(airport.getCity().equals(flight.getFromCity())){
-                    return airport.getAirportName();
-                }
-            }
-        }
-        return null;
-
-//        for (Flight flight : flightMap.values()) {
-//            if (flight.getFlightId() == flightId) {
-//                City city = flight.getFromCity();
-//                for (Airport airport : airportMap.values()) {
-//                    if (airport.getCity().equals(city))
-//                        return airport.getAirportName();
+//        if(flightMap.containsKey(flightId)){
+//            Flight flight=flightMap.get(flightId);
+//            for(Airport airport:airportMap.values()){
+//                if(airport.getCity().equals(flight.getFromCity())){
+//                    return airport.getAirportName();
 //                }
 //            }
 //        }
 //        return null;
+
+        for (Flight flight : flightMap.values()) {
+            if (flight.getFlightId() == flightId) {
+                City city = flight.getFromCity();
+                for (Airport airport : airportMap.values()) {
+                    if (airport.getCity().equals(city))
+                        return airport.getAirportName();
+                }
+            }
+        }
+        return null;
     }
 
     public String addPassenger(Passenger passenger) {
